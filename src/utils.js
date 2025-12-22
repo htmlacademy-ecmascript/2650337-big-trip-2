@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE} from './const.js';
+import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE, FILTER_TYPES} from './const.js';
 
 export function humanizePointDueDate(dueDate, dateFormat) {
   return dueDate ? dayjs(dueDate).format(dateFormat) : '';
@@ -43,4 +43,34 @@ export function getRandomDates(startDate, endDate) {
 
 export function capitalizeString(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export const filter = {
+  [FILTER_TYPES.EVERYTHING]: (points) => points,
+  [FILTER_TYPES.FUTURE]: (points) => points.filter((point) => {
+    const pointDateFrom = dayjs(point.date_from); // проверь названия полей!
+    const now = dayjs();
+    return pointDateFrom.isAfter(now);
+  }),
+  [FILTER_TYPES.PAST]: (points) => points.filter((point) => {
+    const pointDateTo = dayjs(point.date_to);
+    const now = dayjs();
+    return pointDateTo.isBefore(now);
+  }),
+  [FILTER_TYPES.PRESENT]: (points) => points.filter((point) => {
+    const pointDateFrom = dayjs(point.date_from);
+    const pointDateTo = dayjs(point.date_to);
+    const now = dayjs();
+    return (pointDateFrom.isSame(now) || pointDateFrom.isBefore(now)) &&
+      (pointDateTo.isSame(now) || pointDateTo.isAfter(now));
+  }),
+};
+
+export function generateFilter(points) {
+  return Object.entries(filter).map(
+    ([filterType, filterPoints]) => ({
+      type: filterType,
+      count: filterPoints(points).length,
+    })
+  );
 }

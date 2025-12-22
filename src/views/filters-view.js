@@ -1,32 +1,39 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFiltersTemplate() {
-  return `<form class="trip-filters" action="#" method="get">
-    <div class="trip-filters__filter">
-      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything">
-      <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-    </div>
-    <div class="trip-filters__filter">
-      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-      <label class="trip-filters__filter-label" for="filter-future">Future</label>
-    </div>
-
-    <div class="trip-filters__filter">
-      <input id="filter-present" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="present">
-      <label class="trip-filters__filter-label" for="filter-present">Present</label>
-    </div>
-
-    <div class="trip-filters__filter">
-      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" checked>
-      <label class="trip-filters__filter-label" for="filter-past">Past</label>
-    </div>
-
-    <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>`;
+function createFiltersTemplate(filters, currentFilterType = 'everything') {
+  return `
+    <form class="trip-filters" action="#" method="get">
+      ${filters.map((filter) => `
+        <div class="trip-filters__filter">
+          <input
+            id="filter-${filter.type}"
+            class="trip-filters__filter-input visually-hidden"
+            type="radio"
+            name="trip-filter"
+            value="${filter.type}"
+            ${filter.type === currentFilterType ? 'checked' : ''}
+            ${filter.count === 0 ? 'disabled' : ''}>
+          <label class="trip-filters__filter-label" for="filter-${filter.type}">
+            ${filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}
+            ${filter.count > 0 ? ` (${filter.count})` : ''}
+          </label>
+        </div>`).join('')}
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>
+  `;
 }
 
 export default class FiltersView extends AbstractView {
+  #filters = null;
+  #currentFilterType = null;
+
+  constructor({ filters, currentFilterType = 'everything' }) {
+    super();
+    this.#filters = filters;
+    this.#currentFilterType = currentFilterType;
+  }
+
   get template() {
-    return createFiltersTemplate();
+    return createFiltersTemplate(this.#filters, this.#currentFilterType);
   }
 }

@@ -14,3 +14,9 @@ export const DURATION = {
   DAY:5,
   MIN:59
 };
+export const FILTER_TYPES = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
+};

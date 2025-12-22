@@ -8,6 +8,7 @@ const pointModel = new PointModel();
 const mainPresenter = new MainPresenter({
   filterElement: filterElement,
   tripElement: tripElement,
-  pointModel: pointModel });
+  pointModel: pointModel,
+});
 
 mainPresenter.init();

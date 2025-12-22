@@ -3,6 +3,7 @@ import EventsListView from '../views/events-list-view.js';
 import PointView from '../views/point-view.js';
 import SortView from '../views/sort-view.js';
 import FiltersView from '../views/filters-view.js';
+import EmptyListView from '../views/empty-list-view.js';
 
 import { render, replace } from '../framework/render.js';
 
@@ -23,7 +24,16 @@ export default class MainPresenter {
   init() {
     this.points = [...this.pointModel.getPoints()];
 
-    render(new FiltersView(), this.filterElement);
+    if (this.points.length === 0) {
+      render(new EmptyListView(), this.tripElement);
+      return;
+    }
+    const filters = this.pointModel.getFilters();
+
+    const currentFilterType = 'everything';
+
+    render(new FiltersView({ filters, currentFilterType }), this.filterElement);
+
     render(this.sortComponent, this.tripElement);
     render(this.listComponent, this.tripElement);
 

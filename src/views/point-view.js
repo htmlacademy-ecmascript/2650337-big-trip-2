@@ -1,12 +1,8 @@
-import { createElement } from '../render.js';
-import { humanizeTaskDueDate, getDifferenceInTime } from '../utils.js';
+import { humanizePointDueDate, getDifferenceInTime } from '../utils.js';
 import { DATE_FORMAT} from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-function createOffersTemplate(offer) {
-  if (!offer) {
-    return '';
-  }
-
+function createOfferTemplate(offer) {
   return `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
@@ -27,16 +23,16 @@ function createPointTemplate(point, offers, destination) {
   const { name } = destination;
   return `<li class="trip-events__item">
   <div class="event">
-    <time class="event__date" datetime="${dateFrom}">${humanizeTaskDueDate(dateFrom, DATE_FORMAT.MONTH_DAY)}</time>
+    <time class="event__date" datetime="${dateFrom}">${humanizePointDueDate(dateFrom, DATE_FORMAT.MONTH_DAY)}</time>
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${type} ${name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${dateFrom}">${humanizeTaskDueDate(dateFrom, DATE_FORMAT.HOUR_MINUTES)}</time>
+        <time class="event__start-time" datetime="${dateFrom}">${humanizePointDueDate(dateFrom, DATE_FORMAT.HOUR_MINUTES)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${dateTo}">${humanizeTaskDueDate(dateTo, DATE_FORMAT.HOUR_MINUTES)}</time>
+        <time class="event__end-time" datetime="${dateTo}">${humanizePointDueDate(dateTo, DATE_FORMAT.HOUR_MINUTES)}</time>
       </p>
       <p class="event__duration">${getDifferenceInTime(dateFrom, dateTo)}</p>
     </div>
@@ -45,7 +41,7 @@ function createPointTemplate(point, offers, destination) {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-       ${offers.offers.map(createOffersTemplate).join('')}
+       ${offers.offers.map(createOfferTemplate).join('')}
     </ul>
     <button class="event__favorite-btn  ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>
@@ -60,26 +56,26 @@ function createPointTemplate(point, offers, destination) {
 </li>`;
 }
 
-export default class PointView {
-  constructor({ point, offers, destination }) {
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+export default class PointView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #handleArrowClick = null;
+  constructor({ point, offers, destination, onArrowClick }) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#handleArrowClick = onArrowClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#arrowClickHandler);
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #arrowClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleArrowClick?.();
+  };
 }
-

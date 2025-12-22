@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE} from './const.js';
 
-export function humanizeTaskDueDate(dueDate, dateFormat) {
+export function humanizePointDueDate(dueDate, dateFormat) {
   return dueDate ? dayjs(dueDate).format(dateFormat) : '';
 }
 export function getDifferenceInTime(start, end) {
@@ -41,6 +41,6 @@ export function getRandomDates(startDate, endDate) {
   return {dateStart, dateEnd};
 }
 
-export function transformString(string) {
+export function capitalizeString(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }

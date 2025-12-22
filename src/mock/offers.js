@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomId} from '../utils.js';
-import {pointTypes, TYPE_OFFERS, PRICE} from '../const.js';
+import {pointTypes, TYPE_OFFERS, PRICE} from './mock-const.js';
 
 export function getOffers() {
   const mockOffers = [];

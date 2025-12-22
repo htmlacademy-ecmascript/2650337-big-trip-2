@@ -1,5 +1,6 @@
 import {getRandomInteger, getRandomId, getRandomArrayElement} from '../utils.js';
-import {CITIES, DESCRIPTIONS, DESCRIPTIONS_AMOUNT, IMAGES_AMOUNT, PHOTOS_DESCRIPTIONS} from '../const.js';
+import {CITIES, DESCRIPTIONS, DESCRIPTIONS_AMOUNT, IMAGES_AMOUNT, PHOTOS_DESCRIPTIONS} from './mock-const.js';
+
 const citiesList = [...CITIES];
 const destinationsId = [];
 

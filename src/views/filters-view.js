@@ -1,9 +1,12 @@
 import AbstractView from '../framework/view/abstract-view.js';
-const filterIsChecked = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
-const filterIsDisabled = (filterCount) => filterCount === 0 ? 'disabled' : '';
-const filterToUpperCase = (filterType) => filterType.charAt(0).toUpperCase() + filterType.slice(1);
-const filterNumber = (filterCount) => filterCount > 0 ? ` (${filterCount})` : '';
-function createFiltersTemplate(filters, currentFilterType = 'everything') {
+import {FILTER_TYPES} from '../const.js';
+import {capitalizeString} from '../utils.js';
+
+const isChecked = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
+const isDisabled = (filterCount) => filterCount === 0 ? 'disabled' : '';
+const countAmount = (filterCount) => filterCount > 0 ? ` (${filterCount})` : '';
+
+function createFiltersTemplate(filters, currentFilterType = FILTER_TYPES.EVERYTHING) {
   return `
     <form class="trip-filters" action="#" method="get">
       ${filters.map((filter) => `
@@ -14,11 +17,11 @@ function createFiltersTemplate(filters, currentFilterType = 'everything') {
             type="radio"
             name="trip-filter"
             value="${filter.type}"
-            ${filterIsChecked(filter.type, currentFilterType)}
-            ${filterIsDisabled(filter.count)}>
+            ${isChecked(filter.type, currentFilterType)}
+            ${isDisabled(filter.count)}>
           <label class="trip-filters__filter-label" for="filter-${filter.type}">
-            ${filterToUpperCase(filter.type)}
-            ${filterNumber(filter.count)}
+            ${capitalizeString(filter.type)}
+            ${countAmount(filter.count)}
           </label>
         </div>`).join('')}
       <button class="visually-hidden" type="submit">Accept filter</button>
@@ -27,7 +30,7 @@ function createFiltersTemplate(filters, currentFilterType = 'everything') {
 }
 
 export default class FiltersView extends AbstractView {
-  #filters = null;
+  #filters = [];
   #currentFilterType;
 
   constructor({ filters, currentFilterType = 'everything' }) {

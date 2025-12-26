@@ -2,7 +2,6 @@ import { pointTypes, DATE_FORMAT} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-
 function createTypeItemTemplate(id, pointType, checkedType) {
   const isCheckedType = checkedType === pointType ? 'checked' : '';
   return `<div class="event__type-item">
@@ -32,6 +31,7 @@ function createOfferListTemplate(offers, checkedOffersId) {
       </section>`
     : '';
 }
+
 function createPhotosTemplate(pictures) {
   return pictures.length > 0 ?
     `<div class="event__photos-tape">
@@ -41,17 +41,13 @@ function createPhotosTemplate(pictures) {
     </div>`
     : '';
 }
+
 function createDescriptionTemplate(description) {
   return description.length > 0 ? `<p class="event__destination-description">${description}</p>` : '';
 }
 
 function createNewFormTemplate(point, offers, destination, destinations) {
-  const { id,
-    'base_price': basePrice,
-    'date_from': dateFrom,
-    'date_to': dateTo,
-    offers: checkedOffersId,
-    type } = point;
+  const { id, basePrice, dateFrom, dateTo, offers: checkedOffersId, type } = point;
   const { name, description, pictures } = destination;
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
@@ -116,6 +112,7 @@ function createNewFormTemplate(point, offers, destination, destinations) {
             </form >
           </li > `;
 }
+
 export default class NewFormView extends AbstractView {
   #point = null;
   #offers = null;

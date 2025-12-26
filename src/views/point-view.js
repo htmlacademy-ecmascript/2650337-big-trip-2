@@ -12,15 +12,9 @@ function createOfferTemplate(offer) {
   `;
 }
 function createPointTemplate(point, offers, destination) {
-  const {
-    'base_price': basePrice,
-    'date_from': dateFrom,
-    'date_to': dateTo,
-    'is_favorite': isFavorite,
-    type
-  } = point;
-
+  const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
   const { name } = destination;
+
   return `<li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime="${dateFrom}">${humanizePointDueDate(dateFrom, DATE_FORMAT.MONTH_DAY)}</time>
@@ -60,8 +54,8 @@ export default class PointView extends AbstractView {
   #point = null;
   #offers = null;
   #destination = null;
-  #handleOpenClick = null;
-  #handleFavoriteClick = null;
+  #handleOpenClick;
+  #handleFavoriteClick;
 
   constructor({ point, offers, destination, onOpenClick, onFavoriteClick }) {
     super();
@@ -81,11 +75,11 @@ export default class PointView extends AbstractView {
 
   #openClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleOpenClick?.();
+    this.#handleOpenClick();
   };
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFavoriteClick?.();
+    this.#handleFavoriteClick();
   };
 }

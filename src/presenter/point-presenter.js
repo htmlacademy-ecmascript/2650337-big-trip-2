@@ -6,7 +6,7 @@ export default class PointPresenter {
   #point = null;
   #offers = null;
   #destination = null;
-  #destinations = null;
+  #destinations = [];
   #container = null;
   #handleDataChange = null;
   #handleModeChange = null;
@@ -17,10 +17,7 @@ export default class PointPresenter {
   #escKeydownHandler = null;
 
   constructor({ point, offers, destination, destinations, container, onDataChange, onModeChange}) {
-    this.#point = {
-      ...point,
-      isFavorite: point.is_favorite
-    };
+    this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
     this.#destinations = destinations;
@@ -34,10 +31,7 @@ export default class PointPresenter {
   }
 
   updatePoint(updatedPoint) {
-    this.#point = {
-      ...updatedPoint,
-      isFavorite: updatedPoint.is_favorite
-    };
+    this.#point = updatedPoint;
 
     const prevPointComponent = this.#pointComponent;
     this.#pointComponent = new PointView({
@@ -101,7 +95,7 @@ export default class PointPresenter {
   #handleFavoriteClick = () => {
     const updatedPoint = {
       ...this.#point,
-      is_favorite: !this.#point.is_favorite
+      isFavorite: !this.#point.isFavorite
     };
 
     this.#handleDataChange?.(updatedPoint);

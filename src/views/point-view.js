@@ -12,15 +12,9 @@ function createOfferTemplate(offer) {
   `;
 }
 function createPointTemplate(point, offers, destination) {
-  const {
-    'base_price': basePrice,
-    'date_from': dateFrom,
-    'date_to': dateTo,
-    'is_favorite': isFavorite,
-    type
-  } = point;
-
+  const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
   const { name } = destination;
+
   return `<li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime="${dateFrom}">${humanizePointDueDate(dateFrom, DATE_FORMAT.MONTH_DAY)}</time>
@@ -60,22 +54,32 @@ export default class PointView extends AbstractView {
   #point = null;
   #offers = null;
   #destination = null;
-  #handleOpenClick = null;
-  constructor({ point, offers, destination, onOpenClick }) {
+  #handleOpenClick;
+  #handleFavoriteClick;
+
+  constructor({ point, offers, destination, onOpenClick, onFavoriteClick }) {
     super();
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
     this.#handleOpenClick = onOpenClick;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#arrowClickHandler);
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#openClickHandler);
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteClickHandler);
   }
 
   get template() {
     return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  #arrowClickHandler = (evt) => {
+  #openClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleOpenClick?.();
+    this.#handleOpenClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
   };
 }

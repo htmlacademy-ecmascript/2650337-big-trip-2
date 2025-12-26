@@ -3,8 +3,8 @@ import {CITIES, DESCRIPTIONS, DESCRIPTIONS_AMOUNT, IMAGES_AMOUNT, PHOTOS_DESCRIP
 
 const citiesList = [...CITIES];
 const destinationsId = [];
-
 const mockDestinations = [];
+
 function getImages(name) {
   const images = [];
   for(let i = 0; i < (getRandomInteger(1, IMAGES_AMOUNT)); i++) {

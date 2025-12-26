@@ -1,5 +1,4 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { SORT_ITEMS } from '../const.js';
 
 function createSortTemplate(sortItems) {
   return `
@@ -23,9 +22,9 @@ function createSortTemplate(sortItems) {
 }
 
 export default class SortView extends AbstractView {
-  #sortItems = null;
+  #sortItems = [];
 
-  constructor(sortItems = SORT_ITEMS) {
+  constructor(sortItems) {
     super();
     this.#sortItems = sortItems;
   }

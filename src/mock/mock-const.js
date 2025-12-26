@@ -25,7 +25,7 @@ export const PHOTOS_DESCRIPTIONS = [
 ];
 export const IMAGES_AMOUNT = 5;
 export const DESCRIPTIONS_AMOUNT = 8;
-export const POINTS_AMOUNT = 10;
+export const POINTS_AMOUNT = 5;
 export const PRICE = {
   MIN: 1,
   MAX: 1000,

@@ -74,3 +74,14 @@ export function generateFilter(points) {
     })
   );
 }
+
+export const sortPoints = {
+  DAY: (a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)),
+  PRICE: (a, b) => b.basePrice - a.basePrice,
+  TIME: (a, b) => {
+    const durationA = dayjs(a.dateTo).diff(dayjs(a.dateFrom));
+    const durationB = dayjs(b.dateTo).diff(dayjs(b.dateFrom));
+
+    return durationB - durationA;
+  },
+};

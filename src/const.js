@@ -40,3 +40,7 @@ export const EMPTY_MESSAGES = {
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
+export const MODES = {
+  DEFAULT: 'default',
+  EDITING: 'editing',
+};

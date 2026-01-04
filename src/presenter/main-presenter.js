@@ -17,6 +17,7 @@ export default class MainPresenter {
   #emptyMessage = defaultMessage;
   #sortComponent = null;
   #currentSortType = SORT_TYPES.DAY;
+  #points;
 
   constructor({ filterElement, tripElement, pointModel }) {
     this.filterElement = filterElement;
@@ -25,9 +26,9 @@ export default class MainPresenter {
   }
 
   init() {
-    const points = this.pointModel.getPoints();
+    this.#points = this.pointModel.getPoints();
 
-    if (points.length === 0) {
+    if (this.#points.length === 0) {
       render(new EmptyListView(this.#emptyMessage), this.tripElement);
       return;
     }
@@ -43,7 +44,7 @@ export default class MainPresenter {
 
     render(this.#listComponent, this.tripElement);
 
-    this.#renderPoints(points);
+    this.#renderPoints(this.#points);
   }
 
   #renderPoint(point) {
@@ -62,31 +63,28 @@ export default class MainPresenter {
   }
 
   #getSortedPoints() {
-    const points = [...this.pointModel.getPoints()];
-
     switch (this.#currentSortType) {
       case SORT_TYPES.DAY:
-        points.sort(sortPoints.DAY);
+        this.#points.sort(sortPoints[SORT_TYPES.DAY]);
         break;
       case SORT_TYPES.TIME:
-        points.sort(sortPoints.TIME);
+        this.#points.sort(sortPoints[SORT_TYPES.TIME]);
         break;
       case SORT_TYPES.PRICE:
-        points.sort(sortPoints.PRICE);
+        this.#points.sort(sortPoints[SORT_TYPES.PRICE]);
         break;
     }
-    return points;
+    return this.#points;
   }
 
   #handlePointChange = (updatedPoint) => {
     const isUpdated = this.pointModel.updatePoint(updatedPoint);
 
     if (isUpdated) {
-      const pointPresenter = this.#pointPresenters.get(updatedPoint.id);
-      if (pointPresenter) {
-        pointPresenter.updatePoint(updatedPoint);
-      }
+      this.#clearPoints();
+      this.#renderPoints(this.#getSortedPoints());
     }
+
   };
 
   #handleModeChange = () => {

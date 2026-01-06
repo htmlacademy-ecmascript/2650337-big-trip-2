@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE, FILTER_TYPES} from './const.js';
+import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_MINUTE, FILTER_TYPES, SORT_TYPES} from './const.js';
 
 export function humanizePointDueDate(dueDate, dateFormat) {
   return dueDate ? dayjs(dueDate).format(dateFormat) : '';
@@ -76,9 +76,9 @@ export function generateFilter(points) {
 }
 
 export const sortPoints = {
-  DAY: (a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)),
-  PRICE: (a, b) => b.basePrice - a.basePrice,
-  TIME: (a, b) => {
+  [SORT_TYPES.DAY]: (a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)),
+  [SORT_TYPES.PRICE]: (a, b) => b.basePrice - a.basePrice,
+  [SORT_TYPES.TIME]: (a, b) => {
     const durationA = dayjs(a.dateTo).diff(dayjs(a.dateFrom));
     const durationB = dayjs(b.dateTo).diff(dayjs(b.dateFrom));
 

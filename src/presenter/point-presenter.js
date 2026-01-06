@@ -1,6 +1,7 @@
 import PointView from '../views/point-view.js';
 import NewFormView from '../views/new-form-view.js';
 import { render, replace } from '../framework/render.js';
+import {MODES} from '../const.js';
 
 export default class PointPresenter {
   #point = null;
@@ -8,23 +9,26 @@ export default class PointPresenter {
   #destination = null;
   #destinations = [];
   #container = null;
-  #handleDataChange = null;
-  #handleModeChange = null;
+  #allOffers = null;
+  #handleDataChange = () => null;
+  #handleModeChange = () => null;
 
   #pointComponent = null;
   #formComponent = null;
-  #mode = 'default';
+  #mode = MODES.DEFAULT;
   #escKeydownHandler = null;
 
-  constructor({ point, offers, destination, destinations, container, onDataChange, onModeChange}) {
+  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onModeChange}) {
     this.#point = point;
     this.#offers = offers;
+    this.#allOffers = allOffers;
     this.#destination = destination;
     this.#destinations = destinations;
     this.#container = container;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
+
 
   init() {
     this.#renderPoint();
@@ -42,7 +46,7 @@ export default class PointPresenter {
       onFavoriteClick: this.#handleFavoriteClick
     });
 
-    if (this.#mode === 'default' && prevPointComponent) {
+    if (this.#mode === MODES.DEFAULT && prevPointComponent) {
       replace(this.#pointComponent, prevPointComponent);
     }
   }
@@ -60,31 +64,28 @@ export default class PointPresenter {
   }
 
   #replacePointToForm() {
-    this.#handleModeChange?.();
+    this.#handleModeChange();
 
     this.#formComponent = new NewFormView({
       point: this.#point,
       destination: this.#destination,
       offers: this.#offers,
+      allOffers: this.#allOffers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormClose
     });
 
     replace(this.#formComponent, this.#pointComponent);
-    this.#mode = 'editing';
+    this.#mode = MODES.EDITING;
 
     this.#escKeydownHandler = this.#onEscKeydown.bind(this);
     document.addEventListener('keydown', this.#escKeydownHandler);
   }
 
   #replaceFormToPoint() {
-    if (!this.#formComponent) {
-      return;
-    }
-
     replace(this.#pointComponent, this.#formComponent);
-    this.#mode = 'default';
+    this.#mode = MODES.DEFAULT;
     document.removeEventListener('keydown', this.#escKeydownHandler);
   }
 
@@ -117,7 +118,7 @@ export default class PointPresenter {
   }
 
   resetView() {
-    if (this.#mode === 'editing') {
+    if (this.#mode === MODES.EDITING) {
       this.#replaceFormToPoint();
     }
   }

@@ -1,6 +1,6 @@
 import { pointTypes, DATE_FORMAT} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function createTypeItemTemplate(id, pointType, checkedType) {
   const isCheckedType = checkedType === pointType ? 'checked' : '';
@@ -113,29 +113,40 @@ function createNewFormTemplate(point, offers, destination, destinations) {
           </li > `;
 }
 
-export default class NewFormView extends AbstractView {
-  #point = null;
-  #offers = null;
-  #destination = null;
+export default class NewFormView extends AbstractStatefulView {
+  _state = null;
   #destinations;
-  #handleSubmit;
-  #handleClose;
-  constructor({ point, offers, destination, onSubmit, onClose, destinations}) {
+  #allOffers = null;
+  #handleSubmit = () => {};
+  #handleClose = () => {};
+  constructor({ point, offers, allOffers, destination, onSubmit, onClose, destinations}) {
     super();
-    this.#point = point;
-    this.#offers = offers;
-    this.#destination = destination;
+    this._state = {
+      point: point,
+      offers: offers,
+      destination: destination,
+    };
+    this.#allOffers = allOffers;
     this.#handleSubmit = onSubmit;
     this.#handleClose = onClose;
     this.#destinations = destinations;
+    this._restoreHandlers();
+  }
+
+  get template() {
+    return createNewFormTemplate(
+      this._state.point,
+      this._state.offers,
+      this._state.destination,
+      this.#destinations,
+    );
+  }
+
+  #handlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#submitHandler);
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#closeHandler);
-  }
-
-  get template() {
-    return createNewFormTemplate(this.#point, this.#offers, this.#destination, this.#destinations);
   }
 
   #submitHandler = (evt) => {
@@ -147,4 +158,32 @@ export default class NewFormView extends AbstractView {
     evt.preventDefault();
     this.#handleClose();
   };
+
+  #handleTypeChange = (evt) => {
+    const newType = evt.target.value;
+    const newOffers = {
+      type: newType,
+      offers: this.#allOffers.find((allOffers) => allOffers.type === newType).offers
+    };
+    this.updateElement({
+      point: {...this._state.point, type: newType},
+      offers: newOffers
+    });
+  };
+
+  #handleDestinationChange = (evt) => {
+    const newDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
+    if (newDestination) {
+      this.updateElement({ destination: newDestination });
+    }
+  };
+
+  _restoreHandlers() {
+    this.#handlers();
+    this.element.querySelectorAll('.event__type-input').forEach((input) => {
+      input.addEventListener('change', this.#handleTypeChange);
+    });
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#handleDestinationChange);
+  }
 }

@@ -5,6 +5,7 @@ export const DATE_FORMAT = {
   MONTH_DAY: 'MMM DD',
   HOUR_MINUTES: 'HH:mm',
   DAY_MONTH_YEAR_TIME: 'DD/MM/YY[&nbsp;]HH:mm',
+  FLATPICKR: 'd/m/y H:i',
 };
 export const MILLISECONDS_IN_MINUTE = 60000;
 export const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;

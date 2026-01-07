@@ -72,6 +72,7 @@ export default class PointPresenter {
       offers: this.#offers,
       allOffers: this.#allOffers,
       destinations: this.#destinations,
+      // onSubmit: this.#handlePointChange,
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormClose
     });
@@ -102,8 +103,8 @@ export default class PointPresenter {
     this.#handleDataChange?.(updatedPoint);
   };
 
-  #handleFormSubmit = () => {
-    this.#replaceFormToPoint();
+  #handleFormSubmit = (updatedPoint) => {
+    this.#handleDataChange(updatedPoint);
   };
 
   #handleFormClose = () => {

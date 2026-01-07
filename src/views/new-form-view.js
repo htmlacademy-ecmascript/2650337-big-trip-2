@@ -1,6 +1,9 @@
 import { pointTypes, DATE_FORMAT} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+
 
 function createTypeItemTemplate(id, pointType, checkedType) {
   const isCheckedType = checkedType === pointType ? 'checked' : '';
@@ -119,6 +122,9 @@ export default class NewFormView extends AbstractStatefulView {
   #allOffers = null;
   #handleSubmit = () => {};
   #handleClose = () => {};
+  #dateFromPicker = null;
+  #dateToPicker = null;
+
   constructor({ point, offers, allOffers, destination, onSubmit, onClose, destinations}) {
     super();
     this._state = {
@@ -149,9 +155,61 @@ export default class NewFormView extends AbstractStatefulView {
       .addEventListener('click', this.#closeHandler);
   }
 
+  #setDatePickers() {
+    const { dateFrom, dateTo, id } = this._state.point;
+
+    this.#dateFromPicker = flatpickr(
+      this.element.querySelector(`#event-start-time-${id}`),
+      {
+        enableTime: true,
+        dateFormat: DATE_FORMAT.FLATPICKR,
+        defaultDate: dateFrom,
+        onChange: ([userDate]) => {
+          this._state.point.dateFrom = userDate;
+
+          if (this._state.point.dateTo < userDate) {
+            this._state.point.dateTo = userDate;
+            this.#dateToPicker.setDate(userDate);
+          }
+
+          this.#dateToPicker.set('minDate', userDate);
+        },
+      }
+    );
+
+    this.#dateToPicker = flatpickr(
+      this.element.querySelector(`#event-end-time-${id}`),
+      {
+        enableTime: true,
+        dateFormat: DATE_FORMAT.FLATPICKR,
+        defaultDate: dateTo,
+        minDate: dateFrom,
+        onChange: ([userDate]) => {
+          this._state.point.dateTo = userDate;
+        },
+      }
+    );
+  }
+
+  #destroyDatePickers() {
+    if (this.#dateFromPicker) {
+      this.#dateFromPicker.destroy();
+      this.#dateFromPicker = null;
+    }
+
+    if (this.#dateToPicker) {
+      this.#dateToPicker.destroy();
+      this.#dateToPicker = null;
+    }
+  }
+
   #submitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleSubmit();
+    this.#handleSubmit({
+      ...this._state.point,
+      destination: this._state.destination.id,
+      offers: this._state.point.offers,
+    });
   };
 
   #closeHandler = (evt) => {
@@ -179,11 +237,13 @@ export default class NewFormView extends AbstractStatefulView {
   };
 
   _restoreHandlers() {
+    this.#destroyDatePickers();
     this.#handlers();
     this.element.querySelectorAll('.event__type-input').forEach((input) => {
       input.addEventListener('change', this.#handleTypeChange);
     });
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#handleDestinationChange);
+    this.#setDatePickers();
   }
 }

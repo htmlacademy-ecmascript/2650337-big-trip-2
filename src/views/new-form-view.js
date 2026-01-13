@@ -122,10 +122,11 @@ export default class NewFormView extends AbstractStatefulView {
   #allOffers = null;
   #handleSubmit = () => {};
   #handleClose = () => {};
+  #handleDelete = () => {};
   #dateFromPicker = null;
   #dateToPicker = null;
 
-  constructor({ point, offers, allOffers, destination, onSubmit, onClose, destinations}) {
+  constructor({ point, offers, allOffers, destination, onSubmit, onClose, onDelete, destinations}) {
     super();
     this._state = {
       point: point,
@@ -135,6 +136,7 @@ export default class NewFormView extends AbstractStatefulView {
     this.#allOffers = allOffers;
     this.#handleSubmit = onSubmit;
     this.#handleClose = onClose;
+    this.#handleDelete = onDelete;
     this.#destinations = destinations;
     this._restoreHandlers();
   }
@@ -153,6 +155,9 @@ export default class NewFormView extends AbstractStatefulView {
       .addEventListener('submit', this.#submitHandler);
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#closeHandler);
+    this.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#deleteHandler);
   }
 
   #setDatePickers() {
@@ -203,10 +208,32 @@ export default class NewFormView extends AbstractStatefulView {
     }
   }
 
+
   #submitHandler = (evt) => {
     evt.preventDefault();
+
+    const destinationInput =
+      this.element.querySelector('.event__input--destination').value;
+
+    const isValidDestination = this.#destinations.some(
+      (destination) => destination.name === destinationInput
+    );
+
+    if (!isValidDestination) {
+      return;
+    }
+
+    const priceValue = Number(
+      this.element.querySelector('.event__input--price').value
+    );
+
+    if (!Number.isFinite(priceValue) || priceValue < 0) {
+      return;
+    }
+
     this.#handleSubmit({
       ...this._state.point,
+      basePrice: priceValue,
       destination: this._state.destination.id,
       offers: this._state.point.offers,
     });
@@ -215,6 +242,12 @@ export default class NewFormView extends AbstractStatefulView {
   #closeHandler = (evt) => {
     evt.preventDefault();
     this.#handleClose();
+  };
+
+  #deleteHandler = (evt) => {
+
+    evt.preventDefault();
+    this.#handleDelete(this._state.point);
   };
 
   #handleTypeChange = (evt) => {

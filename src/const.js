@@ -37,11 +37,16 @@ export const SORT_ITEMS = [
 ];
 export const EMPTY_MESSAGES = {
   EVERYTHING: 'Click New Event to create your first point',
-  FUTURE: 'There are no past events now',
+  FUTURE: 'There are no future events now',
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
 export const MODES = {
   DEFAULT: 'default',
   EDITING: 'editing',
+};
+export const USER_ACTION = {
+  UPDATE: 'update',
+  DELETE: 'delete',
+  ADD: 'add',
 };

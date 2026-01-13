@@ -11,6 +11,7 @@ export default class PointPresenter {
   #container = null;
   #allOffers = null;
   #handleDataChange = () => null;
+  #handlePointDelete = () => null;
   #handleModeChange = () => null;
 
   #pointComponent = null;
@@ -18,7 +19,7 @@ export default class PointPresenter {
   #mode = MODES.DEFAULT;
   #escKeydownHandler = null;
 
-  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onModeChange}) {
+  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onPointDelete, onModeChange}) {
     this.#point = point;
     this.#offers = offers;
     this.#allOffers = allOffers;
@@ -26,6 +27,7 @@ export default class PointPresenter {
     this.#destinations = destinations;
     this.#container = container;
     this.#handleDataChange = onDataChange;
+    this.#handlePointDelete = onPointDelete;
     this.#handleModeChange = onModeChange;
   }
 
@@ -72,9 +74,9 @@ export default class PointPresenter {
       offers: this.#offers,
       allOffers: this.#allOffers,
       destinations: this.#destinations,
-      // onSubmit: this.#handlePointChange,
       onSubmit: this.#handleFormSubmit,
-      onClose: this.#handleFormClose
+      onClose: this.#handleFormClose,
+      onDelete: this.#handleFormDelete,
     });
 
     replace(this.#formComponent, this.#pointComponent);
@@ -109,6 +111,10 @@ export default class PointPresenter {
 
   #handleFormClose = () => {
     this.#replaceFormToPoint();
+  };
+
+  #handleFormDelete = (point) => {
+    this.#handlePointDelete(point);
   };
 
   #onEscKeydown(evt) {

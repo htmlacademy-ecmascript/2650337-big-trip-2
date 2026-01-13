@@ -85,3 +85,10 @@ export const sortPoints = {
     return durationB - durationA;
   },
 };
+
+export const filtersPoints = {
+  [FILTER_TYPES.PAST]: (point, now) => dayjs(point.dateTo).isBefore(now),
+  [FILTER_TYPES.PRESENT]: (point, now) => dayjs(point.dateFrom).isSameOrBefore(now) &&
+    dayjs(point.dateTo).isSameOrAfter(now),
+  [FILTER_TYPES.FUTURE]: (point, now) => dayjs(point.dateFrom).isAfter(now),
+};

@@ -16,6 +16,19 @@ export default class PointModel {
   #points = Array.from({ length: POINTS_AMOUNT }, () => transformPointToCamelCase(getPoint()));
   #offers = offersByType;
   #destinations = allDestinations;
+  #observers = new Set();
+
+  addObserver(callback) {
+    this.#observers.add(callback);
+  }
+
+  removeObserver(callback) {
+    this.#observers.delete(callback);
+  }
+
+  #notify() {
+    this.#observers.forEach((callback) => callback());
+  }
 
   getPoints() {
     return this.#points;
@@ -47,12 +60,22 @@ export default class PointModel {
     }));
   }
 
+  addPoint(point) {
+    this.#points.push(point);
+    this.#notify();
+  }
+
   updatePoint(updatedPoint) {
     const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
     if (index !== -1) {
       this.#points[index] = updatedPoint;
-      return true;
+      this.#notify();
     }
-    return false;
+  }
+
+  deletePoint(point) {
+    this.#points = this.#points.filter((p) => p.id !== point.id);
+    this.#notify();
   }
 }
+

@@ -178,7 +178,6 @@ export default class MainPresenter {
     this.#newEventButton.disabled = false;
   };
 
-
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();

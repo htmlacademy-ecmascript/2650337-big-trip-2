@@ -58,13 +58,22 @@ export default class NewPointPresenter {
   }
 
   #handleFormSubmit = async (point) => {
+    if(!this.#formComponent) {
+      return;
+    }
+
     this.#formComponent.setSaving();
 
     try {
       await this.#handleDataChange(point);
+      if (!this.#formComponent) {
+        return;
+      }
       this.destroy();
     } catch {
-      this.#formComponent.setAborting();
+      if (this.#formComponent) {
+        this.#formComponent.setAborting();
+      }
     }
   };
 

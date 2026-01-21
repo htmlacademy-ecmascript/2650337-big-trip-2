@@ -204,8 +204,7 @@ export default class MainPresenter {
     evt.preventDefault();
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
 
-    if (this.#isCreating && this.#newPointPresenter) {
-      this.#newPointPresenter.destroy();
+    if (this.#isCreating || this.#newEventButton.getAttribute('aria-disabled') === 'true') {
       return;
     }
 

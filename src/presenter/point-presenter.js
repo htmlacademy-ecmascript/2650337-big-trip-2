@@ -98,17 +98,24 @@ export default class PointPresenter {
   }
 
   #handleOpenClick = () => {
+    if (!this.#canOpenForm()) {
+      return;
+    }
     this.#handleBeforeOpen();
     this.#replacePointToForm();
   };
 
-  #handleFavoriteClick = () => {
+  #handleFavoriteClick = async () => {
     const updatedPoint = {
       ...this.#point,
       isFavorite: !this.#point.isFavorite
     };
 
-    this.#handleDataChange?.(updatedPoint);
+    try {
+      await this.#handleDataChange(updatedPoint);
+    } catch {
+      this.#pointComponent.shake();
+    }
   };
 
   #handleFormSubmit = async (updatedPoint) => {
@@ -118,7 +125,9 @@ export default class PointPresenter {
       await this.#handleDataChange(updatedPoint);
       this.#replaceFormToPoint();
     } catch {
-      this.#formComponent.setAborting();
+      if (this.#formComponent) {
+        this.#formComponent.setAborting();
+      }
     }
   };
 
@@ -132,7 +141,10 @@ export default class PointPresenter {
     try {
       await this.#handlePointDelete(point);
     } catch {
-      this.#formComponent.setAborting();
+      if (this.#formComponent) {
+        this.#formComponent.setAborting();
+      }
+
     }
   };
 

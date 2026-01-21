@@ -225,9 +225,21 @@ export default class NewFormView extends AbstractStatefulView {
   }
 
   #setDisabled(isDisabled) {
-    this.element.querySelectorAll('input, button, textarea, select').forEach((element) => {
-      element.disabled = isDisabled;
+    this.element.querySelectorAll('input, textarea, select').forEach((el) => {
+      el.disabled = isDisabled;
     });
+
+    this.element.querySelector('.event__save-btn').disabled = isDisabled;
+
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    rollupBtn.disabled = false;
+    rollupBtn.removeAttribute('disabled');
+
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+    resetBtn.disabled = false;
+    resetBtn.removeAttribute('disabled');
+
+    this.element.dataset.blocked = String(isDisabled);
   }
 
   #destroyDatePickers() {
@@ -245,6 +257,10 @@ export default class NewFormView extends AbstractStatefulView {
 
   #submitHandler = (evt) => {
     evt.preventDefault();
+
+    if (this.element.querySelector('.event__save-btn').disabled) {
+      return;
+    }
 
     const destinationInput =
       this.element.querySelector('.event__input--destination').value;
@@ -275,13 +291,24 @@ export default class NewFormView extends AbstractStatefulView {
 
   #closeHandler = (evt) => {
     evt.preventDefault();
+
+    if (this.element.querySelector('.event__save-btn').disabled) {
+      return;
+    }
+
     this.#handleClose();
   };
 
   #deleteHandler = (evt) => {
     evt.preventDefault();
+
+    if (this.element.querySelector('.event__save-btn').disabled) {
+      return;
+    }
+
     this.#handleDelete(this._state.point);
   };
+
 
   #handleTypeChange = (evt) => {
     const newType = evt.target.value;

@@ -4,19 +4,19 @@ import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import Api from './api/api.js';
 
-import LoadingView from './views/loading-view.js';
-import FailedLoadView from './views/failed-load-view.js';
+import LoadMessageView from './views/load-message-view.js';
 import { render, remove } from './framework/render.js';
-
-const filterElement = document.querySelector('.trip-controls__filters');
-const tripElement = document.querySelector('.page-main .page-body__container');
-
-const pointModel = new PointModel();
-const filterModel = new FilterModel();
+import {LOAD_MESSAGES} from './const.js';
 
 const AUTHORIZATION = `Basic ${crypto.randomUUID()}`;
 const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
 const api = new Api(END_POINT, AUTHORIZATION);
+
+const filterElement = document.querySelector('.trip-controls__filters');
+const tripElement = document.querySelector('.trip-events');
+
+const pointModel = new PointModel(api);
+const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
   filterModel,
@@ -28,24 +28,21 @@ const mainPresenter = new MainPresenter({
   tripElement: tripElement,
   pointModel: pointModel,
   filterModel: filterModel,
-  api,
 });
 
-const loadingView = new LoadingView();
-render(loadingView, tripElement);
+async function initApp() {
+  const loadingMessage = new LoadMessageView(LOAD_MESSAGES.LOADING);
+  render(loadingMessage, tripElement);
 
-Promise.all([api.points, api.destinations, api.offers])
-  .then(([points, destinations, offers]) => {
-    pointModel.setPoints(points);
-    pointModel.setDestinations(destinations);
-    pointModel.setOffers(offers);
+  const ok = await pointModel.init();
+  remove(loadingMessage);
 
-    remove(loadingView);
+  if(!ok) {
+    render(new LoadMessageView(LOAD_MESSAGES.FAILED_LOAD), tripElement);
+    return;
+  }
 
-    filterPresenter.init();
-    mainPresenter.init();
-  }).catch(() => {
-    remove(loadingView);
-    render(new FailedLoadView(), tripElement);
-  });
-
+  filterPresenter.init();
+  mainPresenter.init();
+}
+initApp().catch(() => {});

@@ -1,4 +1,3 @@
-export const CITIES = ['New York','Seoul','Hong Kong','Da Nang','Brescia','Chicago', 'Oslo', 'Frankfurt', 'Boston'];
 export const pointTypes = ['taxi','bus','train','ship','drive','flight','check-in','sightseeing','restaurant'];
 export const DATE_FORMAT = {
   DAY_MONTH: 'D MMM',
@@ -10,11 +9,6 @@ export const DATE_FORMAT = {
 export const MILLISECONDS_IN_MINUTE = 60000;
 export const MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
 export const MILLISECONDS_IN_DAY = MILLISECONDS_IN_HOUR * 24;
-export const DURATION = {
-  HOUR:5,
-  DAY:5,
-  MIN:59
-};
 export const FILTER_TYPES = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -41,22 +35,24 @@ export const EMPTY_MESSAGES = {
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
+export const LOAD_MESSAGES = {
+  LOADING: 'Loading...',
+  FAILED_LOAD: 'Failed to load latest route information',
+};
+export const BUTTON_TYPES = {
+  NEW_FORM: 'Cancel',
+  EXISTING_FORM: 'Delete',
+};
 export const MODES = {
   DEFAULT: 'default',
   EDITING: 'editing',
 };
-export const USER_ACTION = {
-  UPDATE: 'update',
-  DELETE: 'delete',
-  ADD: 'add',
-};
-
-export const emptyPoint = {
+export const EMPTY_POINT = {
   id: crypto.randomUUID(),
   basePrice: 0,
-  dateFrom: new Date(),
-  dateTo: new Date(),
-  destination: null,
+  dateFrom: null,
+  dateTo: null,
+  destination: '',
   offers: [],
   type: 'flight',
   isFavorite: false,
@@ -70,8 +66,4 @@ export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
   AFTEREND: 'afterend',
-};
-export const API_METHOD = {
-  GET: 'GET',
-  PUT: 'PUT',
 };

@@ -24,6 +24,7 @@ export default class Api extends ApiService {
       body: JSON.stringify(this.#adaptPointToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
+
       .then(ApiService.parseResponse)
       .then((updatedPoint) => this.#adaptPointToClient(updatedPoint));
   }
@@ -35,6 +36,7 @@ export default class Api extends ApiService {
       body: JSON.stringify(this.#adaptPointToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
     })
+
       .then(ApiService.parseResponse)
       .then(this.#adaptPointToClient);
   }
@@ -44,6 +46,7 @@ export default class Api extends ApiService {
       url: `points/${point.id}`,
       method: 'DELETE',
     });
+
   }
 
   #adaptPointToClient(point) {

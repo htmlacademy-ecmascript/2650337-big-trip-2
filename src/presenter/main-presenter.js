@@ -11,6 +11,7 @@ import {SORT_ITEMS, SORT_TYPES, FILTER_TYPES, EMPTY_MESSAGES} from '../const.js'
 import {sortPoints, filtersPoints} from '../utils.js';
 
 export default class MainPresenter {
+  #isCreating = false;
   #listComponent = new EventsListView();
   #pointPresenters = new Map();
   #newPointPresenter = null;
@@ -18,31 +19,19 @@ export default class MainPresenter {
   #currentSortType = SORT_TYPES.DAY;
   #emptyMessageComponent = null;
   #newEventButton = document.querySelector('.trip-main__event-add-btn');
-  #api = null;
 
 
-  constructor({ tripElement, pointModel, filterModel, api }) {
+  constructor({ tripElement, pointModel, filterModel}) {
     this.tripElement = tripElement;
     this.pointModel = pointModel;
     this.filterModel = filterModel;
-    this.#api = api;
   }
 
   init() {
     this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
-    this.#newPointPresenter = new NewPointPresenter({
-      container: this.tripElement,
-      pointModel: this.pointModel,
-      allOffers: this.pointModel.getAllOffers(),
-      destinations: this.pointModel.getDestinations(),
-      onDataChange: this.#handleNewPointSubmit,
-      onDestroy: this.#handleNewPointDestroy,
-      api: this.#api,
-    });
 
     this.pointModel.addObserver(this.#handleModelChange);
     this.filterModel.addObserver(this.#handleModelChange);
-
 
     this.#renderBoard();
   }
@@ -65,16 +54,40 @@ export default class MainPresenter {
   }
 
   #renderSort() {
-    this.#sortComponent = new SortView(
-      SORT_ITEMS,
-      this.#handleSortTypeChange,
-    );
-    render(this.#sortComponent, this.tripElement);
-    render(this.#listComponent, this.tripElement);
+    const sortItems = this.#getSortItems();
+
+    const prevSortComponent = this.#sortComponent;
+    this.#sortComponent = new SortView(sortItems, this.#handleSortTypeChange);
+
+    if (!prevSortComponent) {
+      render(this.#sortComponent, this.tripElement, 'afterbegin');
+    } else {
+      remove(prevSortComponent);
+      render(this.#sortComponent, this.tripElement, 'afterbegin');
+    }
+  }
+
+
+  #renderList() {
+    if (!this.tripElement.contains(this.#listComponent.element)) {
+      render (this.#listComponent, this.tripElement);
+    }
+  }
+
+  #renderNewPointPresenter() {
+    if (this.#newPointPresenter) {
+      return;
+    }
+    this.#newPointPresenter = new NewPointPresenter({
+      container: this.#listComponent.element,
+      allOffers: this.pointModel.getAllOffers(),
+      destinations: this.pointModel.getDestinations(),
+      onDataChange: this.#handleNewPointSubmit,
+      onDestroy: this.#handleNewPointDestroy,
+    });
   }
 
   #renderBoard() {
-
     const points = this.#getPoints();
     this.#clearPoints();
 
@@ -88,13 +101,21 @@ export default class MainPresenter {
         remove(this.#sortComponent);
         this.#sortComponent = null;
       }
-      this.#renderEmptyList();
+
+      this.#renderList();
+      this.#renderNewPointPresenter();
+
+      if (!this.#isCreating) {
+        this.#renderEmptyList();
+      }
       return;
     }
 
-    if (!this.#sortComponent) {
-      this.#renderSort();
-    }
+    this.#renderSort();
+
+    this.#renderList();
+    this.#renderNewPointPresenter();
+
     this.#renderPoints(points);
   }
 
@@ -104,7 +125,6 @@ export default class MainPresenter {
     }
 
     const now = dayjs();
-
     return points.filter((point) =>
       filtersPoints[filterType](point, now)
     );
@@ -113,7 +133,6 @@ export default class MainPresenter {
   #getPoints() {
     const filterType = this.filterModel.getFilter();
     const points = this.pointModel.getPoints();
-
     const filteredPoints = this.#filterPoints(points, filterType);
 
     return this.#getSortedPoints(filteredPoints);
@@ -130,6 +149,17 @@ export default class MainPresenter {
     }
   }
 
+  #getSortItems() {
+    return SORT_ITEMS.map((item) => ({
+      ...item,
+      isChecked: item.type === this.#currentSortType,
+    }));
+  }
+
+  #resetAllPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  }
+
   #renderEmptyList() {
     const filterType = this.filterModel.getFilter().toUpperCase();
     const message = EMPTY_MESSAGES[filterType];
@@ -139,13 +169,11 @@ export default class MainPresenter {
   }
 
   #handlePointUpdate = async (updatedPoint) => {
-    const response = await this.#api.updatePoint(updatedPoint);
-    this.pointModel.updatePoint(response);
+    await this.pointModel.updatePoint(updatedPoint);
   };
 
   #handlePointDelete = async (point) => {
-    await this.#api.deletePoint(point);
-    this.pointModel.deletePoint(point);
+    await this.pointModel.deletePoint(point);
   };
 
   #handleModelChange = () => {
@@ -154,7 +182,10 @@ export default class MainPresenter {
   };
 
   #handleModeChange = () => {
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    if (this.#isCreating) {
+      this.#newPointPresenter.destroy();
+    }
+    this.#resetAllPoints();
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -166,19 +197,51 @@ export default class MainPresenter {
 
   #handleNewEventClick = (evt) => {
     evt.preventDefault();
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#resetAllPoints();
+
+    if (this.#isCreating && this.#newPointPresenter) {
+      this.#newPointPresenter.destroy();
+      return;
+    }
+
+    if (this.#emptyMessageComponent) {
+      remove(this.#emptyMessageComponent);
+      this.#emptyMessageComponent = null;
+    }
+
+    this.#currentSortType = SORT_TYPES.DAY;
+
+    if (this.filterModel.getFilter() !== FILTER_TYPES.EVERYTHING) {
+      this.filterModel.setFilter(FILTER_TYPES.EVERYTHING);
+    }
+
+    this.#renderList();
+    this.#renderNewPointPresenter();
+
+    this.#isCreating = true;
     this.#newPointPresenter.init();
     this.#newEventButton.disabled = true;
   };
 
-  #handleNewPointSubmit = (point) => {
-    this.pointModel.addPoint(point);
+  #handleNewPointSubmit = async (point) => {
+    await this.pointModel.addPoint(point);
   };
 
   #handleNewPointDestroy = () => {
+    this.#isCreating = false;
     this.#newEventButton.disabled = false;
-  };
+    const points = this.#getPoints();
+    if (points.length === 0) {
+      if (this.#sortComponent) {
+        remove(this.#sortComponent);
+        this.#sortComponent = null;
+      }
 
+      if (!this.#emptyMessageComponent) {
+        this.#renderEmptyList();
+      }
+    }
+  };
 
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());

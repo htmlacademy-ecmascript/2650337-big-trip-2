@@ -11,9 +11,13 @@ function createOfferTemplate(offer) {
     </li>
   `;
 }
-function createPointTemplate(point, offers, destination) {
+function createPointTemplate(point, offersByType, destination) {
   const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
   const { name } = destination;
+
+  const availableOffers = offersByType?.offers ?? [];
+  const selectedIds = new Set((point.offers ?? []).map(String));
+  const selectedOffers = availableOffers.filter((offer) => selectedIds.has(String(offer.id)));
 
   return `<li class="trip-events__item">
   <div class="event">
@@ -35,7 +39,7 @@ function createPointTemplate(point, offers, destination) {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-       ${offers.offers.map(createOfferTemplate).join('')}
+    ${selectedOffers.map(createOfferTemplate).join('')}
     </ul>
     <button class="event__favorite-btn  ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>

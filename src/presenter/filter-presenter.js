@@ -1,7 +1,6 @@
 import FiltersView from '../views/filters-view.js';
 import { render, replace } from '../framework/render.js';
-import TripInfoView from '../views/trip-info-view.js';
-import {RenderPosition} from '../const.js';
+import TripInfoPresenter from './trip-info-presenter.js';
 
 export default class FilterPresenter {
   #filterModel = null;
@@ -15,6 +14,9 @@ export default class FilterPresenter {
     this.#filterModel = filterModel;
     this.#pointModel = pointModel;
     this.#container = container;
+
+    this.#pointModel.addObserver(this.#handleModelChange);
+    this.#filterModel.addObserver(this.#handleModelChange);
   }
 
   init() {
@@ -37,11 +39,15 @@ export default class FilterPresenter {
     }
   }
 
+  #handleModelChange = () => {
+    this.init();
+  };
+
   #renderInfo() {
     if (!this.#infoComponent) {
-      this.#infoComponent = new TripInfoView();
-      render(this.#infoComponent, this.#infoContainer, RenderPosition.AFTERBEGIN);
+      this.#infoComponent = new TripInfoPresenter({container: this.#infoContainer, pointModel: this.#pointModel});
     }
+    this.#infoComponent.init();
   }
 
   #handleFilterChange = (filterType) => {

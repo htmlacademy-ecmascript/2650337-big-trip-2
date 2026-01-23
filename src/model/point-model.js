@@ -5,6 +5,11 @@ export default class PointModel {
   #offers = [];
   #destinations = [];
   #observers = new Set();
+  #api = null;
+
+  constructor(api) {
+    this.#api = api;
+  }
 
   addObserver(callback) {
     this.#observers.add(callback);
@@ -59,19 +64,40 @@ export default class PointModel {
     }));
   }
 
-  addPoint(point) {
-    this.#points = [...this.#points, point];
+  async addPoint(point) {
+    const createdPoint = await this.#api.addPoint(point);
+    this.#points = [...this.#points, createdPoint];
     this.#notify();
   }
 
-  updatePoint(updatedPoint) {
-    this.#points = this.#points.map((point) => point.id === updatedPoint.id ? updatedPoint : point);
+  async updatePoint(point) {
+    const updatedPoint = await this.#api.updatePoint(point);
+    this.#points = this.#points.map((p) => p.id === updatedPoint.id ? updatedPoint : p);
     this.#notify();
   }
 
-  deletePoint(point) {
+  async deletePoint(point) {
+    await this.#api.deletePoint(point);
     this.#points = this.#points.filter((p) => p.id !== point.id);
     this.#notify();
+  }
+
+  async init() {
+    try {
+      const [points, destinations, offers] = await Promise.all([
+        this.#api.points,
+        this.#api.destinations,
+        this.#api.offers,
+      ]);
+
+      this.setPoints(points);
+      this.setDestinations(destinations);
+      this.setOffers(offers);
+
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

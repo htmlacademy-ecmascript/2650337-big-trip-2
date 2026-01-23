@@ -9,6 +9,9 @@ export default class FilterModel {
   }
 
   setFilter(filterType) {
+    if (this.#currentFilter === filterType) {
+      return;
+    }
     this.#currentFilter = filterType;
     this.#notify();
   }

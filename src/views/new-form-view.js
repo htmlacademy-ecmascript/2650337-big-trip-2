@@ -296,7 +296,7 @@ export default class NewFormView extends AbstractStatefulView {
   };
 
 
-  #handleTypeChange = (evt) => {
+  #typeChangeHandler = (evt) => {
     const newType = evt.target.value;
     const newOffers = {
       type: newType,
@@ -308,14 +308,14 @@ export default class NewFormView extends AbstractStatefulView {
     });
   };
 
-  #handleDestinationChange = (evt) => {
+  #destinationChangeHandler = (evt) => {
     const newDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
     if (newDestination) {
       this.updateElement({destination: newDestination});
     }
   };
 
-  #handleOffersChange = (evt) => {
+  #offersChangeHandler = (evt) => {
     const offerId = evt.target.name;
     const checked = evt.target.checked;
 
@@ -330,7 +330,7 @@ export default class NewFormView extends AbstractStatefulView {
     });
   };
 
-  #handlePriceInput = (evt) => {
+  #priceInputHandler = (evt) => {
     const value = evt.target.value;
 
     const price = Number(value);
@@ -347,14 +347,14 @@ export default class NewFormView extends AbstractStatefulView {
     this.#destroyDatePickers();
     this.#initHandlers();
     this.element.querySelectorAll('.event__type-input').forEach((input) => {
-      input.addEventListener('change', this.#handleTypeChange);
+      input.addEventListener('change', this.#typeChangeHandler);
     });
     this.element.querySelector('.event__input--destination')
-      .addEventListener('change', this.#handleDestinationChange);
+      .addEventListener('change', this.#destinationChangeHandler);
 
-    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#handleOffersChange);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#offersChangeHandler);
     this.element.querySelector('.event__input--price')
-      .addEventListener('input', this.#handlePriceInput);
+      .addEventListener('input', this.#priceInputHandler);
     this.#setDatePickers();
   }
 }

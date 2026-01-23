@@ -28,7 +28,7 @@ export default class MainPresenter {
   }
 
   init() {
-    this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
+    this.#newEventButton.addEventListener('click', this.#newEventClickHandler);
 
     this.pointModel.addObserver(this.#handleModelChange);
     this.filterModel.addObserver(this.#handleModelChange);
@@ -57,7 +57,7 @@ export default class MainPresenter {
     const sortItems = this.#getSortItems();
 
     const prevSortComponent = this.#sortComponent;
-    this.#sortComponent = new SortView(sortItems, this.#handleSortTypeChange);
+    this.#sortComponent = new SortView(sortItems, this.#sortTypeChangeHandler);
 
     if (!prevSortComponent) {
       render(this.#sortComponent, this.tripElement, 'afterbegin');
@@ -83,7 +83,7 @@ export default class MainPresenter {
       allOffers: this.pointModel.getAllOffers(),
       destinations: this.pointModel.getDestinations(),
       onDataChange: this.#handleNewPointSubmit,
-      onDestroy: this.#handleNewPointDestroy,
+      onDestroy: this.#newPointDestroyHandler,
     });
   }
 
@@ -188,14 +188,14 @@ export default class MainPresenter {
     this.#resetAllPoints();
   };
 
-  #handleSortTypeChange = (sortType) => {
+  #sortTypeChangeHandler = (sortType) => {
     if (this.#currentSortType !== sortType) {
       this.#currentSortType = sortType;
       this.#renderBoard();
     }
   };
 
-  #handleNewEventClick = (evt) => {
+  #newEventClickHandler = (evt) => {
     evt.preventDefault();
     this.#resetAllPoints();
 
@@ -227,7 +227,7 @@ export default class MainPresenter {
     await this.pointModel.addPoint(point);
   };
 
-  #handleNewPointDestroy = () => {
+  #newPointDestroyHandler = () => {
     this.#isCreating = false;
     this.#newEventButton.disabled = false;
     const points = this.#getPoints();

@@ -10,7 +10,7 @@ export default class NewPointPresenter {
   #handleDataChange = () => {
   };
 
-  #handleDestroy = () => {
+  #destroyHandler = () => {
   };
 
   #formComponent = null;
@@ -20,7 +20,7 @@ export default class NewPointPresenter {
     this.#destinations = destinations;
     this.#allOffers = allOffers;
     this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
+    this.#destroyHandler = onDestroy;
   }
 
   init() {
@@ -45,7 +45,7 @@ export default class NewPointPresenter {
 
     render(this.#formComponent, this.#container, 'afterbegin');
 
-    document.addEventListener('keydown', this.#onEscKeydown);
+    document.addEventListener('keydown', this.#escKeydownHandler);
   }
 
   destroy() {
@@ -56,8 +56,8 @@ export default class NewPointPresenter {
     remove(this.#formComponent);
     this.#formComponent = null;
 
-    document.removeEventListener('keydown', this.#onEscKeydown);
-    this.#handleDestroy();
+    document.removeEventListener('keydown', this.#escKeydownHandler);
+    this.#destroyHandler();
   }
 
   #handleFormSubmit = async (point) => {
@@ -81,7 +81,7 @@ export default class NewPointPresenter {
     this.destroy();
   };
 
-  #onEscKeydown = (evt) => {
+  #escKeydownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();

@@ -83,7 +83,7 @@ export default class PointPresenter {
     replace(this.#formComponent, this.#pointComponent);
     this.#mode = MODES.EDITING;
 
-    this.#escKeydownHandler = this.#onEscKeydown.bind(this);
+    this.#escKeydownHandler = this.#escPressHandler.bind(this);
     document.addEventListener('keydown', this.#escKeydownHandler);
   }
 
@@ -135,7 +135,7 @@ export default class PointPresenter {
     }
   };
 
-  #onEscKeydown(evt) {
+  #escPressHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#replaceFormToPoint();

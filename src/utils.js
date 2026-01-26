@@ -60,11 +60,11 @@ export function generateFilter(points) {
 }
 
 export const sortPoints = {
-  [SORT_TYPES.DAY]: (a, b) => dayjs(a.dateFrom).diff(dayjs(b.dateFrom)),
-  [SORT_TYPES.PRICE]: (a, b) => b.basePrice - a.basePrice,
-  [SORT_TYPES.TIME]: (a, b) => {
-    const durationA = dayjs(a.dateTo).diff(dayjs(a.dateFrom));
-    const durationB = dayjs(b.dateTo).diff(dayjs(b.dateFrom));
+  [SORT_TYPES.DAY]: (firstDate, secondDate) => dayjs(firstDate.dateFrom).diff(dayjs(secondDate.dateFrom)),
+  [SORT_TYPES.PRICE]: (firstPrice, secondPrice) => secondPrice.basePrice - firstPrice.basePrice,
+  [SORT_TYPES.TIME]: (firstTime, secondTime) => {
+    const durationA = dayjs(firstTime.dateTo).diff(dayjs(firstTime.dateFrom));
+    const durationB = dayjs(secondTime.dateTo).diff(dayjs(secondTime.dateFrom));
 
     return durationB - durationA;
   },
